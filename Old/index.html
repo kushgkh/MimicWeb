@@ -1,0 +1,10 @@
+<script>
+var request = require('request');
+
+var propertiesObject = { field1:'test1', field2:'test2' };
+
+request({url: "http://localhost:8080/" , qs:propertiesObject}, function(err, response, body) {
+  if(err) { console.log(err); return; }
+  console.log("Get response: " + response.statusCode);
+});
+</script>

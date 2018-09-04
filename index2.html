@@ -1,0 +1,33 @@
+<script>
+  var handleSuccess = function(stream) {
+    var context = new AudioContext();
+    var source = context.createMediaStreamSource(stream);
+    var processor = context.createScriptProcessor(1024, 1, 1);
+
+    source.connect(processor);
+    processor.connect(context.destination);
+
+    var time = 0;
+    processor.onaudioprocess = function(e) {
+      // Do something with the data, i.e Convert this to WAV
+      var myAudio = e.inputBuffer;
+      var snip = myAudio.getChannelData(0);
+      var snipTime = myAudio.duration;
+      time += snipTime;
+
+
+
+      var avg = 0
+
+      for(var i = 0; i < snip.length; i++)
+      {
+          avg += Math.abs(snip[i]);
+      }
+
+      console.log(snip.length);
+    };
+  };
+
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+      .then(handleSuccess);
+</script>

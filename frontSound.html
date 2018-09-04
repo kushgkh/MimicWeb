@@ -1,0 +1,88 @@
+
+First name: <input type="text" id="name"><br>
+<input id="Hi" type="button" value="Hi" onclick="getName();" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+    function getName()
+    {
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(handleSuccess);
+
+        var newName = document.getElementById("name").value;
+    }
+
+    function getSum(arr)
+    {
+        var sum = 0;
+        for(var i = 0 ; i < arr.length ; i++)
+        {
+          sum += Math.abs(arr[i]);
+        }
+        return sum;
+    }
+
+
+    var handleSuccess = function(stream) {
+        console.log("test");
+        var context = new AudioContext();
+        var source = context.createMediaStreamSource(stream);
+        var processor = context.createScriptProcessor(1024, 1, 1);
+
+        source.connect(processor);
+        processor.connect(context.destination);
+
+        var time = 0;
+        var snap = new Array();
+        processor.onaudioprocess = function(e) {
+          // Do something with the data, i.e Convert this to WAV
+          var myAudio = e.inputBuffer;
+          var snip = myAudio.getChannelData(0);
+          var snipTime = myAudio.duration;
+          time += snipTime;
+          if(getSum(snip) > 4)
+          {
+            snap += snip;
+          }
+          
+          //console.log(snip);
+          //console.log(stream);
+          if(time > 0.5)
+          {
+             
+             var newName = JSON.stringify(snip);
+
+
+
+              $.ajax('http://localhost:3000/fft', {
+                  method: 'POST',
+                  data: { 'Help': newName}
+              })
+              .then(
+                  function success(name) {
+                     
+                      alert("Hello " + name + " from the backend!");
+                      console.log(name);
+
+                  },
+
+                  function fail(data, status) {
+                      alert('Request failed.  Returned status of ' + status);
+                  }
+              );
+
+             stream.getTracks()[0].stop();
+             processor.disconnect(context.destination);
+          }
+         
+
+          
+        };
+    };
+
+
+
+  
+    
+</script>
+
