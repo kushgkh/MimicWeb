@@ -1,6 +1,6 @@
 
 First name: <input type="text" id="name"><br>
-<input id="Hi" type="button" value="Hi" onclick="getName();" />
+<input id="Hi" type="button" value="Record" onclick="getName();" />
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -23,11 +23,25 @@ First name: <input type="text" id="name"><br>
     }
 
 
+    function count_nonzero(arr)
+    {
+        var count = 0;
+        for(var i = 0 ; i < arr.length ; i++)
+        {
+          if(Math.abs(arr[i]) < 0.001)
+          {
+            count+= 1;
+          }
+        }
+        return count;
+    }
+
+
     var handleSuccess = function(stream) {
         console.log("test");
         var context = new AudioContext();
         var source = context.createMediaStreamSource(stream);
-        var processor = context.createScriptProcessor(1024, 1, 1);
+        var processor = context.createScriptProcessor(16384, 1, 1);
 
         source.connect(processor);
         processor.connect(context.destination);
@@ -40,18 +54,19 @@ First name: <input type="text" id="name"><br>
           var snip = myAudio.getChannelData(0);
           var snipTime = myAudio.duration;
           time += snipTime;
-          if(getSum(snip) > 4)
+          if(getSum(snip) > 20)
           {
             snap += snip;
           }
           
           //console.log(snip);
           //console.log(stream);
-          if(time > 0.5)
+          if(count_nonzero(snip) < 50)
           {
              
+             console.log(snip);
              var newName = JSON.stringify(snip);
-
+             //console.log(newName);
 
 
               $.ajax('http://localhost:3000/fft', {
@@ -61,8 +76,8 @@ First name: <input type="text" id="name"><br>
               .then(
                   function success(name) {
                      
-                      alert("Hello " + name + " from the backend!");
-                      console.log(name);
+                      alert("Hello " + name.Help + " from the backend!");
+                      //console.log(name);
 
                   },
 

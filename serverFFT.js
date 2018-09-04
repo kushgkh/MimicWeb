@@ -35,45 +35,39 @@ app.post('/hat', function (req, res) {
 
 app.post('/fft', function (req, res) {
 
-
+  //Temp input is a dictionary and needs to be indexed using ["43"]
   var tempInput = JSON.parse(req.body.Help);
+  console.log(typeof(tempInput));
 
-  console.log(tempInput);
+  var fftlen = Object.keys(tempInput).length;
 
-  var len = 0;
-  while(len < 100)
-  {
-    console.log(tempInput[i]);
-    len++;
-
-  }
-
-
-  var fftlen = getMax(tempInput.length);
-  console.log(fftlen)
   var input = new Array(fftlen);
 
   for(var i = 0 ; i < fftlen ; i++)
   {
-    input[i] = tempInput[i]
-    if(input[i] > 0.0001)
-    {
-      console.log(input[i]);
-    }
+    input[i] = tempInput[i.toString()];
+
   }
-  //console.log(input.length);
   var f = new FFT(input.length); 
-  //console.log(input);
-  //console.log(input.length);
+
+ 
+
   var output = f.createComplexArray();
   f.realTransform(output, input);
 
+  //console.log(output);
 
   var maxdex = -1;
   var maxVal = -1;
 
+  console.log(output);
+
   for(var i = 0 ; i < 65536 ; i++)
   {
+    if(i > 70 && i < 500)
+    {
+      console.log(i + " " + output[i]);
+    }
     if(maxVal < Math.abs(output[i]))
     {
       maxVal = Math.abs(output[i]);
@@ -84,8 +78,7 @@ app.post('/fft', function (req, res) {
   console.log(maxVal);
 
 
-  res.sendStatus(maxdex);
-
+  res.send({ 'Help': maxdex});
 })
 
 
